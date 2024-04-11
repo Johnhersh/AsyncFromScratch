@@ -50,11 +50,11 @@ class ThreadPool:
 
 
 start_time = time.time()
-thread_pool = ThreadPool(12)
+thread_pool = ThreadPool(1)
 
 def work_function(i):
     print(f"Running message {i}")
-    time.sleep(random.randint(1, 500) / 1000)
+    time.sleep(random.randint(1, 100) / 1000)
     return i
 
 # Create tasks without queuing them
