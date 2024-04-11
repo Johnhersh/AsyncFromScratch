@@ -4,16 +4,19 @@ import random
 import time
 
 class Task:
-    def __init__(self, func):
+    def __init__(self, func, thread_pool):
         self.func = func
         self.done_event = threading.Event()
         self.result = None
+        self.thread_pool = thread_pool
+        # Note: We should also save the exception, but f it
 
     def run(self):
         self.result = self.func()
         self.done_event.set()
 
     def wait(self):
+        self.thread_pool.queue_work(self)
         self.done_event.wait()
         return self.result
 
@@ -24,7 +27,7 @@ class ThreadPool:
 
         for _ in range(num_workers):
             worker = threading.Thread(target=self.worker_loop)
-            worker.daemon = True
+            worker.daemon = True  # Daemon threads will exit when the main program exits
             worker.start()
             self.workers.append(worker)
 
@@ -35,27 +38,28 @@ class ThreadPool:
         while True:
             task = self.work_queue.get()
             if task is None:
-                break
+                return
             task.run()
             if task.result is not None:
                 print(f"Worker {threading.current_thread().name} processed: {task.result}")
-            self.work_queue.task_done()
-
+            self.work_queue.task_done() # Tell that *a* task is done, when the counter is 0 the pool can close via join
+    
     def run_all(self, tasks):
         for task in tasks:
             self.queue_work(task)
         for task in tasks:
             task.wait()
 
-def work_function(i):
-    time.sleep(random.randint(1, 500) / 1000)
-    return f"message #{i}"
-
 start_time = time.time()
+thread_pool = ThreadPool(12)
 
-thread_pool = ThreadPool(4)
+def work_function(i):
+    print(f"Running message {i}")
+    time.sleep(random.randint(1, 500) / 1000)
+    return i
 
-tasks = [Task(lambda i=i: work_function(i)) for i in range(100)]
+# Create tasks without queuing them
+tasks = [Task(lambda i=i: work_function(i), thread_pool) for i in range(100)]
 
 thread_pool.run_all(tasks)
 
