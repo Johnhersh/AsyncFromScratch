@@ -20,7 +20,7 @@ class ThreadPool:
         while True:
             work_func = self.work_queue.get()
             if work_func is None:
-                break # Should be continue
+                break # Should be continue, will fix in next step
             result = work_func()
             print(f"Worker {threading.current_thread().name} processed: {result}")
             self.work_queue.task_done() # Tell that *a* task is done, when the counter is 0 the pool can close via join
