@@ -16,7 +16,7 @@ class Task:
         self.done_event.set()
 
     def wait(self):
-        self.thread_pool.queue_work(self.run)
+        self.thread_pool.queue_work(self)
         self.done_event.wait()
         return self.result
 
@@ -36,11 +36,11 @@ class ThreadPool:
 
     def worker_loop(self):
         while True:
-            work = self.work_queue.get()
-            if work is None:
-                continue # Should be continue
-            print(f"Worker {threading.current_thread().name} processed:")
-            work()
+            task = self.work_queue.get()
+            if task is None:
+                continue
+            task.run()
+            print(f"Worker {threading.current_thread().name} processed: {task.result}")
             self.work_queue.task_done() # Tell that *a* task is done, when the counter is 0 the pool can close via join
 
     def join(self):
