@@ -43,9 +43,6 @@ class ThreadPool:
             print(f"Worker {threading.current_thread().name} processed: {task.result}")
             self.work_queue.task_done() # Tell that *a* task is done, when the counter is 0 the pool can close via join
 
-    def join(self):
-        self.work_queue.join()  # Wait for all tasks to be processed
-
 
 start_time = time.time()
 thread_pool = ThreadPool(4)
@@ -62,10 +59,6 @@ tasks = [Task(lambda i=i: work_function(i), thread_pool) for i in range(100)]
 for task in tasks:
     result = task.wait()  # This will execute them one at a time
     print(f"Task result: {result}")
-
-# No need to join the threads if they are daemons, as they will exit with the main program
-# If you want to ensure they finish even if the main program can exit, uncomment the next line
-# thread_pool.join()
 
 end_time = time.time()
 print(f"Total time taken: {end_time - start_time:.2f} seconds")
