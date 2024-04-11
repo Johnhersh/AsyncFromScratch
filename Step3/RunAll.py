@@ -38,17 +38,16 @@ class ThreadPool:
         while True:
             task = self.work_queue.get()
             if task is None:
-                return
+                continue
             task.run()
-            if task.result is not None:
-                print(f"Worker {threading.current_thread().name} processed: {task.result}")
-            self.work_queue.task_done() # Tell that *a* task is done, when the counter is 0 the pool can close via join
+            print(f"Worker {threading.current_thread().name} processed: {task.result}")
     
     def run_all(self, tasks):
         for task in tasks:
             self.queue_work(task)
         for task in tasks:
             task.wait()
+
 
 start_time = time.time()
 thread_pool = ThreadPool(12)
@@ -64,7 +63,4 @@ tasks = [Task(lambda i=i: work_function(i), thread_pool) for i in range(100)]
 thread_pool.run_all(tasks)
 
 end_time = time.time()
-all_results = [task.result for task in tasks]
-
 print(f"Total time taken: {end_time - start_time:.2f} seconds")
-print(f"All results: {all_results}")
