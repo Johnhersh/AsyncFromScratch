@@ -38,7 +38,8 @@ class ThreadPool:
         while True:
             work = self.work_queue.get()
             if work is None:
-                return
+                continue # Should be continue
+            print(f"Worker {threading.current_thread().name} processed:")
             work()
             self.work_queue.task_done() # Tell that *a* task is done, when the counter is 0 the pool can close via join
 
@@ -50,8 +51,8 @@ start_time = time.time()
 thread_pool = ThreadPool(4)
 
 def work_function(i):
-    print(f"Processing message {i}")
-    time.sleep(random.randint(1, 1000) / 1000)
+    print(f"Running message {i}")
+    time.sleep(random.randint(1, 500) / 1000)
     return i
 
 # Create tasks without queuing them
