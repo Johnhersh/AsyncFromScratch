@@ -36,7 +36,7 @@ start_time = time.time()
 thread_pool = ThreadPool(1)
 
 def work_function(i):
-    print(f"Running message {i}")
+    print(f"Handling request {i}")
     time.sleep(random.randint(1, 100) / 1000)
     return i
 
