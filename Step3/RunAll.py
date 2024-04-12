@@ -31,8 +31,8 @@ class ThreadPool:
             worker.start()
             self.workers.append(worker)
 
-    def queue_work(self, work):
-        self.work_queue.put(work)
+    def queue_work(self, work_func):
+        self.work_queue.put(work_func)
 
     def worker_loop(self):
         while True:
@@ -48,18 +48,18 @@ class ThreadPool:
         for task in tasks:
             task.wait()
 
-
 start_time = time.time()
 thread_pool = ThreadPool(1)
 
 def work_function(i):
-    print(f"Running message {i}")
+    print(f"Handling request {i}")
     time.sleep(random.randint(1, 100) / 1000)
     return i
 
-# Create tasks without queuing them
+# Create tasks without queuing them, similar to Promise.all() in js
 tasks = [Task(lambda i=i: work_function(i), thread_pool) for i in range(100)]
 
+# Wait for all tasks to complete; they get queued upon calling wait()
 thread_pool.run_all(tasks)
 
 end_time = time.time()
